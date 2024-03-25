@@ -45,7 +45,7 @@ STATES:
 11 -> follow object release line
 12 -> release object
 13 -> turn back on track and set state to 0
-14 -> 
+16 -> helper to 90 turn
 """
 
 
@@ -95,8 +95,9 @@ class LineFollower:
             self.release_object()
         elif self.state == 13:
             self.follow([BLACK, self.followed_color])
-        elif self.state == 14 or self.state == 15:
+        elif self.state == 14 or self.state == 15 or self.state == 16:
             self.color_turn()
+        
         
         
 
@@ -138,6 +139,9 @@ class LineFollower:
             elif (self.right_color in COLORFUL_COLORS):
                 self.state = 2
                 self.followed_color = self.right_color
+            elif (self.left_color == BLACK and self.right_color == BLACK):
+                self.state = 16
+                self.followed_color = BLACK
         elif self.state == 3:
             if (self.left_color == self.followed_color and self.right_color == self.followed_color):
                 self.state = 4
@@ -181,7 +185,7 @@ class LineFollower:
     
     def color_turn(self):
         sign = 0
-        if self.state == 1 or self.state == 6 or self.state == 9 or self.state == 14:
+        if self.state == 1 or self.state == 6 or self.state == 9 or self.state == 14 or self.state == 16:
             print('Turning left', self.left_color)
             self.turndir = 'l'
             sign = -1
@@ -199,7 +203,9 @@ class LineFollower:
             self.check_colors()
             tank_drive.on(SpeedPercent(self.speed * sign), SpeedPercent(-self.speed * sign))
             #print(self.turndir, self.right_color, self.followed_color)
-        if (self.state == 1 or self.state == 2):
+        if (self.state == 16):
+            self.state = 0
+        elif (self.state == 1 or self.state == 2):
             self.state = 3
         elif (self.state == 6 or self.state == 7):
             self.state = 8
@@ -207,6 +213,7 @@ class LineFollower:
             self.state = 11
         elif self.state == 14 or self.state == 15:
             self.state = 0
+        
 
     def grab_object(self):
         print('grabbing object')
